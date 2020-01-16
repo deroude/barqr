@@ -1,22 +1,20 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import './App.css';
-import QrReader from 'react-qr-reader';
+import { Route, BrowserRouter as Router } from 'react-router-dom'
+import Landing from './views/landing/Landing';
+import Consumer from './views/consumer/Consumer';
+import Venue from './views/venue/Venue';
 
 class App extends Component {
-
-  state = { text: '' }
-
   render() {
     return (
-      <div className="App">
-        <QrReader
-          delay={300}
-          onError={err => console.log(err)}
-          onScan={data => this.setState({ text: data })}
-          style={{ width: '100%' }}
-        />
-        <div>{this.state.text}</div>
-      </div>
+      <Router>
+        <Fragment>
+          <Route path="/" component={Landing} />
+          <Route path="/consumer" component={Consumer} />
+          <Route path="/venue" component={Venue} />
+        </Fragment>
+      </Router>
     );
   }
 }
