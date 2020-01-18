@@ -1,15 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
+import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { CardMedia, Card, CardHeader, CardContent } from "@material-ui/core";
 import QrReader from 'react-qr-reader';
 
+const tablePattern = /^\/venues\/([a-zA-Z0-9]+)\/tables\/([a-zA-Z0-9]+)$/
+
 const styles = theme => ({
     card: {
         minWidth: 275,
         maxWidth: 800,
-        width:'100%'
+        width: '100%'
     },
     bullet: {
         display: 'inline-block',
@@ -26,20 +29,27 @@ const styles = theme => ({
 
 class Landing extends Component {
 
-    state = { text: "Please scan the QR code on your table" };
+    state = { text: "Please scan the QR code on your table", venue: null, table: null };
+
+    readQR(data) {
+        if (data && tablePattern.test(data)) {
+            const params = tablePattern.exec(data);
+            this.setState({ text: data, venue: params[1], table: params[2] });
+        }
+    }
 
     render() {
         const { classes } = this.props;
         return (
             <Card className={classes.card} variant="outlined">
                 <CardHeader
-                    title="Welcome to Bar QR"
+                    title="Welcome to Club QR"
                 />
                 <CardMedia>
                     <QrReader
                         delay={300}
                         onError={err => console.log(err)}
-                        onScan={data => { if (data) { this.setState({ text: data }); console.log(data); } }}
+                        onScan={this.readQR.bind(this)}
                         style={{ width: '100%' }}
                     />
                 </CardMedia>
@@ -47,6 +57,9 @@ class Landing extends Component {
                     <Typography variant="body2" color="textSecondary" component="p">
                         {this.state.text}
                     </Typography>
+                    {this.state.venue && this.state.table &&
+                        <Redirect push to={`/consumer/${this.state.venue}/${this.state.table}`} />
+                    }
                 </CardContent>
             </Card>
         );
@@ -55,6 +68,6 @@ class Landing extends Component {
 
 Landing.propTypes = {
     classes: PropTypes.object.isRequired,
-  };
+};
 
 export default withStyles(styles)(Landing);
